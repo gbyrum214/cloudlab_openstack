@@ -4457,38 +4457,61 @@ openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-
 openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.22 testport2
 openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.23 testport3
 openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.24 testport4
+openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.25 testport5
+openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.26 testport6
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /tmp/setup/OL7.vmdk https://clemson.box.com/shared/static/h3d5ixmw1z71i3it9h9hjn9wvjxwj6tg.vmdk
-glance image-create --name OL7 --disk-format vmdk --visibility public --container-format bare < /tmp/setup/OL7.vmdk
+# Get head node VMDK file
+wget -O /tmp/setup/Head_VMDK.vmdk https://clemson.box.com/shared/static/h3d5ixmw1z71i3it9h9hjn9wvjxwj6tg.vmdk
+glance image-create --name Head_VMDK --disk-format vmdk --visibility public --container-format bare < /tmp/setup/Head_VMDK.vmdk
+
+# See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
+# Get compute node VMDK
+wget -O /tmp/setup/Compute_VMDK.vmdk https://clemson.box.com/shared/static/h3d5ixmw1z71i3it9h9hjn9wvjxwj6tg.vmdk
+glance image-create --name Compute_VMDK --disk-format vmdk --visibility public --container-format bare < /tmp/setup/Compute_VMDK.vmdk
+
+# See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
+# Get compute node VMDK
+wget -O /tmp/setup/Storage_VMDK.vmdk https://clemson.box.com/shared/static/h3d5ixmw1z71i3it9h9hjn9wvjxwj6tg.vmdk
+glance image-create --name Storage_VMDK --disk-format vmdk --visibility public --container-format bare < /tmp/setup/Storage_VMDK.vmdk
 
 
 project_id=`openstack project list -f value | grep admin | cut -d' ' -f 1`
 flavor_id=`openstack flavor list -f value | grep m1.small | cut -d' ' -f 1`
-image_id=`openstack image list -f value | grep OL7 | cut -d' ' -f 1`
 security_id=`openstack security group list -f value | grep $project_id | cut -d' ' -f 1`
 
-## ***** NODE 1 *****
+image_id=`openstack image list -f value | grep Head_VMDK | cut -d' ' -f 1`
+## ***** HEAD NODE *****
 port_id=`openstack port list -f value | grep testport1 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-openstack server create --flavor m1.medium --security-group $security_id --image OL7 --nic port-id=$port_id node1
+openstack server create --flavor m1.medium --security-group $security_id --image Head_VMDK --nic port-id=$port_id head
 
-## ***** NODE 2 *****
+image_id=`openstack image list -f value | grep Compute_VMDK | cut -d' ' -f 1`
+## ***** COMPUTE NODE 1 *****
 port_id=`openstack port list -f value | grep testport2 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-openstack server create --flavor m1.medium --security-group $security_id --image OL7 --nic port-id=$port_id node2
+openstack server create --flavor m1.medium --security-group $security_id --image Compute_VMDK --nic port-id=$port_id compute1
 
-## ***** NODE 3 *****
+## ***** COMPUTE NODE 2 *****
 port_id=`openstack port list -f value | grep testport3 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-openstack server create --flavor m1.medium --security-group $security_id --image OL7 --nic port-id=$port_id node3
+openstack server create --flavor m1.medium --security-group $security_id --image Compute_VMDK --nic port-id=$port_id compute2
 
-## ***** NODE 4 *****
+## ***** COMPUTE NODE 3 *****
 port_id=`openstack port list -f value | grep testport4 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-openstack server create --flavor m1.medium --security-group $security_id --image OL7 --nic port-id=$port_id node4
+openstack server create --flavor m1.medium --security-group $security_id --image Compute_VMDK --nic port-id=$port_id compute3
 
+image_id=`openstack image list -f value | grep Storage_VMDK | cut -d' ' -f 1`
+## ***** STORAGE NODE 1 *****
+port_id=`openstack port list -f value | grep testport4 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image Compute_VMDK --nic port-id=$port_id storage1
 
+## ***** STORAGE NODE 2 *****
+port_id=`openstack port list -f value | grep testport4 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image Compute_VMDK --nic port-id=$port_id storage2
 
 
 echo "***"
