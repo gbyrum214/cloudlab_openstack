@@ -4474,10 +4474,11 @@ security_id=`openstack security group list -f value | grep $project_id | cut -d'
 port_id=`openstack port list -f value | grep testport1 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
 openstack server create --flavor m1.medium --security-group $security_id --image headnode --nic port-id=$port_id head
-glance image-delete $image_id
+
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
 wget -O /tmp/setup/computenode.vmdk https://clemson.box.com/shared/static/03i1f7a2ksk56kcmw0ev7ytszu7ulco9.vmdk
+glance image-delete $image_id
 glance image-create --name computenode --disk-format vmdk --visibility public --container-format bare < /tmp/setup/computenode.vmdk
 
 
@@ -4490,6 +4491,17 @@ security_id=`openstack security group list -f value | grep $project_id | cut -d'
 port_id=`openstack port list -f value | grep testport2 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
 openstack server create --flavor m1.medium --security-group $security_id --image computenode --nic port-id=$port_id compute1
+
+## ***** Compute Node 2 *****
+port_id=`openstack port list -f value | grep testport3 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image computenode --nic port-id=$port_id compute2
+
+## ***** Compute Node 3 *****
+port_id=`openstack port list -f value | grep testport4 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image computenode --nic port-id=$port_id compute3
+
 glance image-delete $image_id
 
 
