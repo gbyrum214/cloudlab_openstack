@@ -4461,8 +4461,8 @@ openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-
 openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.26 testport6
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /image-dataset/headnode.vmdk https://clemson.box.com/shared/static/0792t4shhhsa20n056srn58p5e60fr8z.vmdk
-glance image-create --name headnode --disk-format vmdk --visibility public --container-format bare < /image-dataset/headnode.vmdk
+wget -O /tmp/setup/headnode.vmdk https://clemson.box.com/shared/static/0792t4shhhsa20n056srn58p5e60fr8z.vmdk
+glance image-create --name headnode --disk-format vmdk --visibility public --container-format bare < /tmp/setup/headnode.vmdk
 
 
 project_id=`openstack project list -f value | grep admin | cut -d' ' -f 1`
@@ -4477,8 +4477,8 @@ openstack server create --flavor m1.medium --security-group $security_id --image
 
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /image-dataset/computenode.vmdk https://clemson.box.com/shared/static/03i1f7a2ksk56kcmw0ev7ytszu7ulco9.vmdk
-glance image-create --name computenode --disk-format vmdk --visibility public --container-format bare < /image-dataset/computenode.vmdk
+wget -O /tmp/setup/computenode.vmdk https://clemson.box.com/shared/static/03i1f7a2ksk56kcmw0ev7ytszu7ulco9.vmdk
+glance image-create --name computenode --disk-format vmdk --visibility public --container-format bare < /tmp/setup/computenode.vmdk
 
 
 project_id=`openstack project list -f value | grep admin | cut -d' ' -f 1`
