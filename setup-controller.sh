@@ -4502,8 +4502,28 @@ port_id=`openstack port list -f value | grep testport4 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
 openstack server create --flavor m1.medium --security-group $security_id --image computenode --nic port-id=$port_id compute3
 
+# See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
+wget -O /tmp/setup/storagenode.vmdk https://clemson.box.com/shared/static/lek6f651x3iiizhhho7gra2k3tjs4g8m.vmdk
 glance image-delete $image_id
+glance image-create --name storagenode --disk-format vmdk --visibility public --container-format bare < /tmp/setup/storagenode.vmdk
 
+
+project_id=`openstack project list -f value | grep admin | cut -d' ' -f 1`
+flavor_id=`openstack flavor list -f value | grep m1.small | cut -d' ' -f 1`
+image_id=`openstack image list -f value | grep storagenode | cut -d' ' -f 1`
+security_id=`openstack security group list -f value | grep $project_id | cut -d' ' -f 1`
+
+## ***** Storage Node 1 *****
+port_id=`openstack port list -f value | grep testport5 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image storagenode --nic port-id=$port_id storage1
+
+## ***** Storage Node 2 *****
+port_id=`openstack port list -f value | grep testport6 | cut -d' ' -f 1`
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create --flavor m1.medium --security-group $security_id --image storagenode --nic port-id=$port_id storage2
+
+glance image-delete $image_id
 
 echo "***"
 echo "*** Done with OpenStack Setup!"
