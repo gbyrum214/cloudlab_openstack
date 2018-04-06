@@ -4470,7 +4470,7 @@ flavor_id=`openstack flavor list -f value | grep m1.small | cut -d' ' -f 1`
 image_id=`openstack image list -f value | grep headnode | cut -d' ' -f 1`
 security_id=`openstack security group list -f value | grep $project_id | cut -d' ' -f 1`
 
-## ***** NODE 1 *****
+## ***** Head Node *****
 port_id=`openstack port list -f value | grep testport1 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
 openstack server create --flavor m1.medium --security-group $security_id --image headnode --nic port-id=$port_id head
@@ -4523,7 +4523,6 @@ port_id=`openstack port list -f value | grep testport6 | cut -d' ' -f 1`
 # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
 openstack server create --flavor m1.medium --security-group $security_id --image storagenode --nic port-id=$port_id storage2
 
-glance image-delete $image_id
 
 echo "***"
 echo "*** Done with OpenStack Setup!"
