@@ -4505,7 +4505,7 @@ openstack server create --flavor m1.medium --security-group $security_id --image
 rm /tmp/setup/computenode.vmdk
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /tmp/setup/storagenode.vmdk https://clemson.box.com/shared/static/lek6f651x3iiizhhho7gra2k3tjs4g8m.vmdk
+wget -O /tmp/setup/storagenode.vmdk https://clemson.box.com/shared/static/8lgvj1nhq4ovdt71glez8kiyqvmlibp5.vmdk
 glance image-delete $image_id
 glance image-create --name storagenode --disk-format vmdk --visibility public --container-format bare < /tmp/setup/storagenode.vmdk
 
